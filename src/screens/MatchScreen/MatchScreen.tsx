@@ -39,12 +39,12 @@ function MatchScreen() {
   let navigate = useNavigate()
   const handleAdopt = () => {
     alert('Thank you for adopting your new best friend')
-    navigate('/')
+    navigate('/AdoptAFriend/')
   }
 
   const handleQuit = () => {
     alert("What a shame you didn't adopt")
-    navigate('/')
+    navigate('/AdoptAFriend/')
   }
 
   return (

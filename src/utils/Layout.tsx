@@ -14,7 +14,7 @@ const Layout = () =>{
     const { currentUser } = context;
 
     if(!currentUser){
-        return <Navigate to={'login'} replace/>
+        return <Navigate to={'/AdoptAFriend/login'} replace/>
     }
     return (
         <div className={`theme-light`}>   

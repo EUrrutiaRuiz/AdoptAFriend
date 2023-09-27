@@ -44,12 +44,28 @@
             gap: 10px;
             button{
                 background-color: #EB5757;
-                width: 8vw;
+                width: 10vw;
                 padding: 20px;
                 border: none;
                 border-radius: 15px;
                 color: white;
             }
+        }
+    }
+
+    .order {
+        margin-top: 30px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+
+        button{
+            border: none;
+            height: 5vh;
+            width: 6vw;
+            background-color: #EB5757;
+            border-radius: 10px;
+            color: white;
         }
     }
     

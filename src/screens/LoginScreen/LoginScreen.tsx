@@ -19,7 +19,7 @@ function LoginScreen() {
 
   useEffect(() =>{
     if(currentUser){
-      navigate(`/`)
+      navigate(`/AdoptAFriend/`)
     }
   }, [navigate, currentUser])
 

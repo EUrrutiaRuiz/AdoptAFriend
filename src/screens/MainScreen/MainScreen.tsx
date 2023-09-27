@@ -41,6 +41,7 @@ function MainScreen() {
   const [favoriteDogs, setFavoriteDogs] = useState<string[]>([])
   const [minAge, setMinAge] = useState<number>(0);
   const [maxAge, setMaxAge] = useState<number>(20);
+  const [order, setOrder] = useState<string>('asc');
   
   
   useEffect(() => {
@@ -64,7 +65,7 @@ function MainScreen() {
       const storedCheckedItems: string[] = JSON.parse(storedCheckedItemsString);
       beedsQuery = storedCheckedItems.map(breed => `breeds=${encodeURIComponent(breed)}`).join('&');
     }
-    const apyQuery = `${currentPageUrl}?size=20&${beedsQuery}${min}${max}`
+    const apyQuery = `${currentPageUrl}?size=20&${beedsQuery}${min}${max}&sort=breed:${order}`
 
     fetch(apyQuery,{
       credentials: 'include',
@@ -87,13 +88,13 @@ function MainScreen() {
       })
       .then(response => response.json())
       .then((dogs: DogData[]) => {
-        setDogs(dogs);
+        setDogs(dogs.sort((a, b) => a.breed.localeCompare(b.breed)));
       })
       .catch(error => {
         console.error('Error fetching the dogs:', error);
       });
 
-  }, [currentPageUrl, checkedItems, minAge, maxAge]);
+  }, [currentPageUrl, checkedItems, minAge, maxAge, order]);
 
 
   const handleFavorite = (id: string) => {
@@ -138,7 +139,7 @@ function MainScreen() {
   const handleClick = async () =>{
     try{
       const data = await fetchData(favoriteDogs);
-      navigate(`/match/${data.match}`)
+      navigate(`/AdoptAFriend/match/${data.match}`)
     }catch (error) {
       console.error('Error on Match: ', error);
     }
@@ -175,6 +176,16 @@ function MainScreen() {
           }
         </div>
         
+      </div>
+      <div className='order'>
+        <span>Order by:</span>
+        <button onClick={()=>{
+          if(order === 'asc'){
+            setOrder('desc')
+          }else{
+            setOrder('asc')
+          }
+        }}>{order === 'asc' ? 'ASC':'DSC'}</button>
       </div>
       <div className="dogs">
         {dogs?.map(dog=>(

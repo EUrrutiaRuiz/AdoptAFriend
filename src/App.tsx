@@ -9,10 +9,10 @@ function App() {
 
   return (
     <Routes>
-      <Route path="login" element={<LoginScreen/>}/>
+      <Route path="AdoptAFriend/login" element={<LoginScreen/>}/>
       <Route path="/" element={<Layout/>}>
-        <Route path="/" element={<MainScreen/>}/>
-        <Route path="match/:id/" element={<MatchScreen/>}/>
+        <Route path="AdoptAFriend/" element={<MainScreen/>}/>
+        <Route path="AdoptAFriend/match/:id/" element={<MatchScreen/>}/>
       </Route>
     </Routes>
   )
