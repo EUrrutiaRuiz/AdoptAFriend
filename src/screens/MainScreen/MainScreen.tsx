@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import './main.scss'
 import Dog from '../../components/Dog/Dog'
 import { useNavigate } from 'react-router-dom';
@@ -27,27 +27,66 @@ interface ValueProps {
 }
 
 function MainScreen() {
-
-  
-  const url = 'https://frontend-take-home-service.fetch.com';
-  const urlComp = url + '/dogs/search?size=20'
-
+  const baseURL = 'https://frontend-take-home-service.fetch.com';
   const [dogs, setDogs] = useState<DogData[]>([]);
+  const [order, setOrder] = useState<string>('asc');
   const [apiResponse, setApiResponse] = useState<ApiResponse>();
-  const [checkedItems, setCheckedItems] = useState< string[]>([]);
+  const [checkedItems, setCheckedItems] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentPageUrl, setCurrentPageUrl] = useState<string>(`${url}/dogs/search?size=20`);
-  const [nextPageUrl, setNextPageUrl] = useState<string | undefined>();
-  const [prevPageUrl, setPrevPageUrl] = useState<string | undefined>();
-  const [favoriteDogs, setFavoriteDogs] = useState<string[]>([])
+  const [favoriteDogs, setFavoriteDogs] = useState<string[]>([]);
   const [minAge, setMinAge] = useState<number>(0);
   const [maxAge, setMaxAge] = useState<number>(20);
-  const [order, setOrder] = useState<string>('asc');
-  const [page, setPage] = useState<boolean>(false)
+  const currentPageUrl = `${baseURL}/dogs/search?size=20`;
   
+  const navigate = useNavigate();
+  
+  const fetchData = useCallback(async (array: string[]) => {
+    try {
+      const response = await fetch(`${baseURL}/dogs/match`,{
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(array),
+        credentials: 'include',
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching data: ', error);
+      throw error;
+    }
+  }, []);
+
+  const nextPrev = async (action: boolean) => {
+    try {
+      const query = action ? apiResponse?.next : apiResponse?.prev;
+      
+      if (!query) {
+        console.error('No next/prev query available');
+        return;
+      }
+      
+      const response = await fetch(baseURL.concat(query), { credentials: 'include' });
+      const data: ApiResponse = await response.json();
+      setApiResponse(data);
+  
+      const dogResponse = await fetch('https://frontend-take-home-service.fetch.com/dogs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data.resultIds),
+        credentials: 'include',
+      });
+  
+      const dogs: DogData[] = await dogResponse.json();
+      setDogs(dogs.sort((a, b) => a.breed.localeCompare(b.breed)));
+  
+    } catch (error) {
+      console.error('Error fetching the dogs:', error);
+    }
+  };
   
   useEffect(() => {
-
     if (!currentPageUrl) return;
 
     const storedCheckedItemsString = localStorage.getItem('checkedItems');
@@ -69,48 +108,29 @@ function MainScreen() {
       
     }
 
-    //const apyQuery = `${currentPageUrl}${min}${max}&sort=breed:${order}`
-    var apyQuery = currentPageUrl
-
-    console.log(page)
-    if(dogs.length>0){
-      if(page){
-        apyQuery = currentPageUrl
-      }else{
-        apyQuery = `${urlComp}&${beedsQuery}${min}${max}&sort=breed:${order}`
-      }
-    }
-    console.log(apyQuery)
-
-    fetch(apyQuery,{
-      credentials: 'include',
-    })
+    const apyQuery = `${currentPageUrl}&${beedsQuery}${min}${max}&sort=breed:${order}`
+    
+    fetch(apyQuery, { credentials: 'include' })
       .then(response => response.json())
       .then((data: ApiResponse) => {
         setApiResponse(data);
-        setNextPageUrl(data.next);
-        setPrevPageUrl(data.prev);
-        console.log(data)
-        const dogIds = data.resultIds.slice(0, 100);
+
         return fetch('https://frontend-take-home-service.fetch.com/dogs', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(dogIds),
+          body: JSON.stringify(data.resultIds),
           credentials: 'include',
         });
+
       })
       .then(response => response.json())
       .then((dogs: DogData[]) => {
-        setDogs(dogs);
-        setPage(false);
+        setDogs(dogs.sort((a,b) =>a.breed.localeCompare(b.breed)));
       })
-      .catch(error => {
-        console.error('Error fetching the dogs:', error);
-      });
-
-  }, [currentPageUrl, checkedItems, minAge, maxAge, order]);
+      .catch(error => console.error('Error fetching the dogs:', error));
+  }, [currentPageUrl, checkedItems, minAge, maxAge, order, fetchData]);
 
 
   const handleFavorite = (id: string) => {
@@ -131,26 +151,6 @@ function MainScreen() {
     setMinAge(min);
     setMaxAge(max)
   };
-
-  async function fetchData(array: string[]) {
-    try {
-      const response = await fetch('https://frontend-take-home-service.fetch.com/dogs/match',{
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-          },
-        body: JSON.stringify(array),
-        credentials: 'include',
-      });
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Error fetching data: ', error);
-      throw error;
-    }
-  }
-
-  let navigate = useNavigate()
 
   const handleClick = async () =>{
     try{
@@ -209,8 +209,8 @@ function MainScreen() {
         ))}
       </div>
       <div className="pagination">
-        {prevPageUrl && <button onClick={() => {setCurrentPageUrl(`${url}${prevPageUrl}`);setPage(true)}}>PREVIOUS</button>}
-        {nextPageUrl && <button onClick={() => {setCurrentPageUrl(`${url}${nextPageUrl}`);setPage(true)}}>NEXT</button>}
+        {apiResponse?.prev && <button onClick={() => nextPrev(false)}>PREVIOUS</button>}
+        {apiResponse?.next && <button onClick={() => nextPrev(true)}>NEXT</button>}
       </div>
       {isModalOpen && <Modal onClose={handleCloseModal} onReceiveData={handleReceiveData} onReceiveRangeData={handleRangeData}/>}
     </div>
