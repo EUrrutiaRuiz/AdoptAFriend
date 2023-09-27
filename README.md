@@ -1,3 +1,11 @@
+# How to Run the proyect locally 
+- Clone Repository
+- Run as a normal Vite - React proyect "npm run dev"
+
+Dependencies used:
+- react-dom
+- react-router-dom
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
