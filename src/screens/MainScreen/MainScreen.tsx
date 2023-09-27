@@ -30,18 +30,20 @@ function MainScreen() {
 
   
   const url = 'https://frontend-take-home-service.fetch.com';
+  const urlComp = url + '/dogs/search?size=20'
 
   const [dogs, setDogs] = useState<DogData[]>([]);
   const [apiResponse, setApiResponse] = useState<ApiResponse>();
   const [checkedItems, setCheckedItems] = useState< string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentPageUrl, setCurrentPageUrl] = useState<string>(`${url}/dogs/search`);
+  const [currentPageUrl, setCurrentPageUrl] = useState<string>(`${url}/dogs/search?size=20`);
   const [nextPageUrl, setNextPageUrl] = useState<string | undefined>();
   const [prevPageUrl, setPrevPageUrl] = useState<string | undefined>();
   const [favoriteDogs, setFavoriteDogs] = useState<string[]>([])
   const [minAge, setMinAge] = useState<number>(0);
   const [maxAge, setMaxAge] = useState<number>(20);
   const [order, setOrder] = useState<string>('asc');
+  const [page, setPage] = useState<boolean>(false)
   
   
   useEffect(() => {
@@ -64,8 +66,21 @@ function MainScreen() {
     if (storedCheckedItemsString) {
       const storedCheckedItems: string[] = JSON.parse(storedCheckedItemsString);
       beedsQuery = storedCheckedItems.map(breed => `breeds=${encodeURIComponent(breed)}`).join('&');
+      
     }
-    const apyQuery = `${currentPageUrl}?size=20&${beedsQuery}${min}${max}&sort=breed:${order}`
+
+    //const apyQuery = `${currentPageUrl}${min}${max}&sort=breed:${order}`
+    var apyQuery = currentPageUrl
+
+    console.log(page)
+    if(dogs.length>0){
+      if(page){
+        apyQuery = currentPageUrl
+      }else{
+        apyQuery = `${urlComp}&${beedsQuery}${min}${max}&sort=breed:${order}`
+      }
+    }
+    console.log(apyQuery)
 
     fetch(apyQuery,{
       credentials: 'include',
@@ -75,7 +90,7 @@ function MainScreen() {
         setApiResponse(data);
         setNextPageUrl(data.next);
         setPrevPageUrl(data.prev);
-        
+        console.log(data)
         const dogIds = data.resultIds.slice(0, 100);
         return fetch('https://frontend-take-home-service.fetch.com/dogs', {
           method: 'POST',
@@ -88,7 +103,8 @@ function MainScreen() {
       })
       .then(response => response.json())
       .then((dogs: DogData[]) => {
-        setDogs(dogs.sort((a, b) => a.breed.localeCompare(b.breed)));
+        setDogs(dogs);
+        setPage(false);
       })
       .catch(error => {
         console.error('Error fetching the dogs:', error);
@@ -193,8 +209,8 @@ function MainScreen() {
         ))}
       </div>
       <div className="pagination">
-        {prevPageUrl && <button onClick={() => setCurrentPageUrl(`${url}${prevPageUrl}`)}>PREVIOUS</button>}
-        {nextPageUrl && <button onClick={() => setCurrentPageUrl(`${url}${nextPageUrl}`)}>NEXT</button>}
+        {prevPageUrl && <button onClick={() => {setCurrentPageUrl(`${url}${prevPageUrl}`);setPage(true)}}>PREVIOUS</button>}
+        {nextPageUrl && <button onClick={() => {setCurrentPageUrl(`${url}${nextPageUrl}`);setPage(true)}}>NEXT</button>}
       </div>
       {isModalOpen && <Modal onClose={handleCloseModal} onReceiveData={handleReceiveData} onReceiveRangeData={handleRangeData}/>}
     </div>
