@@ -1,0 +1,29 @@
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 46px 94px;
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 99999;
+
+    .left {
+        display:flex;
+        align-items: center;
+
+    }
+    .right {
+        display:flex;
+        align-items: center;
+
+        button {
+            width: 10vw;
+            height: 50px;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+        }
+
+    }
+}

@@ -1,0 +1,48 @@
+.checkbox-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-auto-rows: minmax(20px, auto);
+    grid-gap: 8px;
+    max-height: 220px; /* Altura máxima para 10 filas considerando un grid-gap de 8px */
+    overflow-y: auto;
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        
+    }
+
+    .checkbox-item input[type="checkbox"] {
+        display: none;
+    }
+  
+  .checkbox-item .box {
+    display: inline-block;
+    width: 15px;
+    height: 15px; 
+    background-color: #f0f0f0;
+    border: 2px solid #ccc; 
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s;
+  }
+  
+  .checkbox-item input[type="checkbox"]:checked + .box {
+    background-color: #EB5757; 
+    border-color: #EB5757;
+  }
+
+  .checkbox-item input[type="checkbox"]:checked + .box::after {
+    content: '\2713'; 
+    font-size: 20px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ffffff; 
+  }
+  
+}
+  

@@ -1,0 +1,64 @@
+.login {
+    height: 100vh;
+    background-color: rgb(22, 111, 121);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+   .card {
+        width: 60%;
+        display: flex;
+        background-color: white;
+        border-radius: 10px;
+        min-height: 600px;
+        overflow: hidden;
+
+        .left {
+            flex: 1;
+            background: linear-gradient(rgba(0, 59, 65, 0.4), rgba(22, 121, 57, 0.2)), url("https://images.pexels.com/photos/3361739/pexels-photo-3361739.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1") center;
+            background-size: cover;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            color: white;
+            justify-content: center;
+
+            h1 {
+                font-size: 70px;
+                line-height: 10px;
+            }
+        }
+        .right {
+            flex: 1;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            justify-content: center;
+            h1 {
+                color: #555;
+            }
+            form {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                input {
+                    border: none;
+                    border-bottom: 1px solid lightgrey;
+                    padding: 20px;
+                }
+                button {
+                    width: 70%;
+                    height: 50px;
+                    padding: 10px;
+                    border: none;
+                    background-color: rgb(22, 111, 121);
+                    color: white;
+                    cursor: pointer;
+                    border-radius: 5px;
+                }
+            }
+        }
+   } 
+}
